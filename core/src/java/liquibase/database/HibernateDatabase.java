@@ -17,14 +17,51 @@ import java.util.*;
 
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.cfg.Ejb3Column;
+import org.hibernate.ejb.Ejb3Configuration;
+import org.hibernate.envers.configuration.AuditConfiguration;
+import org.hibernate.event.PostInsertEventListener;
+
+import javax.persistence.EntityManagerFactory;
 
 public class HibernateDatabase implements Database {
 
     private Configuration configuration;
     private String defaultSchema;
+    private ConfigurationType configurationType = ConfigurationType.HIBERNATE_CFG;
+
+    public static enum ConfigurationType {
+        HIBERNATE_CFG,
+        PERSISTENCE
+    }
 
     public HibernateDatabase(Configuration configuration) {
         this.configuration = configuration;
+    }
+
+    public HibernateDatabase(ConfigurationType configurationType, String configFile) {
+        if (configurationType != null) {
+            this.configurationType = configurationType;
+        }
+        switch (configurationType) {
+            case PERSISTENCE:
+                Ejb3Configuration ejb3Configuration = new Ejb3Configuration();
+                ejb3Configuration.configure(configFile, new HashMap());
+                configuration = ejb3Configuration.getHibernateConfiguration();
+                configuration.setProperty("hibernate.dialect", ejb3Configuration.getProperties().getProperty("hibernate.dialect"));
+                for (PostInsertEventListener postInsertEventListener : configuration.getEventListeners().getPostInsertEventListeners()) {
+                    if (postInsertEventListener instanceof org.hibernate.envers.event.AuditEventListener) {
+                        AuditConfiguration.getFor(configuration);
+                    }
+                }
+                break;
+            case HIBERNATE_CFG:
+            default:
+                configuration = new AnnotationConfiguration();
+                configuration.configure(configFile);
+                break;
+        }
+
     }
 
     public HibernateDatabase(String configFile) {
@@ -101,7 +138,13 @@ public class HibernateDatabase implements Database {
     }
 
     public String getConnectionURL() throws JDBCException {
-        return "hibernate:"+configuration.toString();
+        switch (configurationType) {
+            case PERSISTENCE:
+                 return "persistence:"+configuration.toString();
+            case HIBERNATE_CFG:
+            default:
+                 return "hibernate:"+configuration.toString();
+        }
     }
 
     public String getConnectionUsername() throws JDBCException {

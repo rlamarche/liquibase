@@ -10,6 +10,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.MySQL5InnoDBDialect;
 import org.hibernate.engine.Mapping;
+import org.hibernate.id.IdentifierGenerator;
 import org.hibernate.mapping.*;
 
 import java.io.File;
@@ -119,8 +120,20 @@ public class HibernateDatabaseSnapshot implements DatabaseSnapshot {
                         PrimaryKey pk = new PrimaryKey();
                         pk.setName(hibernatePrimaryKey.getName());
                         pk.setTable(table);
+
                         for (Object hibernateColumn : hibernatePrimaryKey.getColumns()) {
+                            String columnName = ((org.hibernate.mapping.Column) hibernateColumn).getName();
+                            org.hibernate.mapping.Column hibColumn = (org.hibernate.mapping.Column) hibernateColumn;
                             pk.getColumnNamesAsList().add(((org.hibernate.mapping.Column) hibernateColumn).getName());
+                            if (columnsMap.containsKey(table.getName() + "." + columnName) && hibColumn.getValue() instanceof SimpleValue) {
+                                SimpleValue simpleValue = (SimpleValue) hibColumn.getValue();
+                                if ("native".equals(simpleValue.getIdentifierGeneratorStrategy())) {
+                                    columnsMap.get(table.getName() + "." + columnName).setAutoIncrement(true);
+                                }
+                            }
+                            if (columnsMap.containsKey(table.getName() + "." + columnName)) {
+                                columnsMap.get(table.getName() + "." + columnName).setNullable(false);
+                            }
                         }
                         primaryKeys.add(pk);
                     }

@@ -111,7 +111,7 @@ public class LiquibaseDatabaseDiff extends AbstractLiquibaseChangeLogMojo {
                                      + "must be provided to perform a diff.");
     }
 
-    if (baseUrl.startsWith("hibernate:")) {
+    if (baseUrl.startsWith("hibernate:") || baseUrl.startsWith("persistence:")) {
 
     } else {
       if (baseUsername == null) {

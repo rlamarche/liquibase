@@ -57,7 +57,17 @@ public class CommandLineUtils {
                     }
                 }
             }
-
+            if (url.startsWith("persistence:")) {
+                try {
+                    return createPersistenceDatabase(classLoader, url);
+                } catch (NoClassDefFoundError e) {
+                    try {
+                        return createPersistenceDatabase(Thread.currentThread().getContextClassLoader(), url);
+                    } catch (NoClassDefFoundError e1) {
+                        throw new MigrationFailedException(null, "Class " + e1.getMessage() + " not found.  Make sure all required Hibernate and JDBC libraries are in your classpath");
+                    }
+                }
+            }
             Driver driverObject;
             DatabaseFactory databaseFactory = DatabaseFactory.getInstance();
             if (databaseClass != null) {
@@ -101,6 +111,10 @@ public class CommandLineUtils {
     private static Database createHibernateDatabase(ClassLoader classLoader, String url) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ClassNotFoundException {
         return (Database) Class.forName(HibernateDatabase.class.getName(), true, classLoader).getConstructor(String.class).newInstance(url.substring("hibernate:".length()));
     }
+    private static Database createPersistenceDatabase(ClassLoader classLoader, String url) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ClassNotFoundException {
+         return (Database) Class.forName(HibernateDatabase.class.getName(), true, classLoader).getConstructor(HibernateDatabase.ConfigurationType.class, String.class).newInstance(HibernateDatabase.ConfigurationType.PERSISTENCE, url.substring("persistence:".length()));
+    }
+
 
     public static void doDiff(Database baseDatabase, Database targetDatabase) throws JDBCException {
         Diff diff = new Diff(baseDatabase, targetDatabase);

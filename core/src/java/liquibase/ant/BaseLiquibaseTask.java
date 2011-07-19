@@ -208,6 +208,8 @@ public class BaseLiquibaseTask extends Task {
         
         if (databaseUrl.startsWith("hibernate:")) {
             database = new HibernateDatabase(databaseUrl.substring("hibernate:".length()));
+        } else if (databaseUrl.startsWith("persistence:")) {
+            database = new HibernateDatabase(HibernateDatabase.ConfigurationType.PERSISTENCE, databaseUrl.substring("persistence:".length()));
         } else {
 	        if (databaseClass != null) {
 	        	  try {

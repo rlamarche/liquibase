@@ -365,7 +365,7 @@ public abstract class SqlDatabaseSnapshot implements DatabaseSnapshot {
                     fkInfo = new ForeignKey();
                 } */
 
-                if (fkInfo == null || ( (fkInfo != null) && (!fkInfo.getPrimaryKeyTable().getName().equals(pkTableName)))) {
+                if (fkInfo == null || ( (fkInfo != null) && ((!fkInfo.getPrimaryKeyTable().getName().equals(pkTableName)) || !fkName.equals(fkInfo.getName())))) {
                     fkInfo = new ForeignKey();
                 }
 

@@ -150,11 +150,12 @@ public class ForeignKey implements DatabaseObject, Comparable<ForeignKey> {
         if (foreignKeyColumns != null) {
             result = 31 * result + foreignKeyColumns.toUpperCase().hashCode();
         }
+        /*
         if (this.updateRule != null)
             result = 31 * result + this.updateRule.hashCode();
         if (this.deleteRule != null)
             result = 31 * result + this.deleteRule.hashCode();
-
+          */
 
         return result;
     }
@@ -178,10 +179,11 @@ public class ForeignKey implements DatabaseObject, Comparable<ForeignKey> {
         if (returnValue == 0 && this.getPrimaryKeyColumns() != null && o.getPrimaryKeyColumns() != null) {
             returnValue = this.getPrimaryKeyColumns().compareToIgnoreCase(o.getPrimaryKeyColumns());
         }
+        /*
         if (returnValue == 0 && this.updateRule != null && o.getUpdateRule() != null)
             returnValue = this.updateRule.compareTo(o.getUpdateRule());
         if (returnValue == 0 && this.deleteRule != null && o.getDeleteRule() != null)
-            returnValue = this.deleteRule.compareTo(o.getDeleteRule());
+            returnValue = this.deleteRule.compareTo(o.getDeleteRule());         */
         return returnValue;
     }
 

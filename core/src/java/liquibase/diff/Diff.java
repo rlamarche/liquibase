@@ -255,6 +255,8 @@ public class Diff {
     }
 
     private void checkForeignKeys(DiffResult diffResult) {
+        Set<ForeignKey> newHash = new HashSet<ForeignKey>(targetSnapshot.getForeignKeys()); // Bug sur les HashSet ? Ceci est un workaround
+        targetSnapshot.getForeignKeys().addAll(newHash);
         for (ForeignKey baseFK : baseSnapshot.getForeignKeys()) {
             if (!targetSnapshot.getForeignKeys().contains(baseFK)) {
                 diffResult.addMissingForeignKey(baseFK);

@@ -8,7 +8,7 @@ import java.util.List;
 public class Index implements DatabaseObject, Comparable<Index> {
     private String name;
     private Table table;
-    private Boolean unique;
+    private Boolean unique = Boolean.FALSE;
     private List<String> columns = new ArrayList<String>();
     private String filterCondition;
 
@@ -106,7 +106,7 @@ public class Index implements DatabaseObject, Comparable<Index> {
     public String toString() {
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append(getName());
-        if (!this.unique) {
+        if (this.unique != null || !this.unique) {
             stringBuffer.append(" unique ");
         }
         stringBuffer.append(" on ").append(table.getName()).append("(");
