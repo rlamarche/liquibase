@@ -16,7 +16,7 @@ public class Index implements DatabaseObject, Comparable<Index> {
     private String name;
     private Table table;
 	private String tablespace;
-    private Boolean unique;
+    private Boolean unique = Boolean.FALSE;
     private List<String> columns = new ArrayList<String>();
     private String filterCondition;
 	// Contain associations of index
